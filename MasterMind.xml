@@ -1,4 +1,4 @@
-<form theme="dark">
+<form theme="light">
   <label>MasterMind</label>
   <description>Investigate PLC Master(s)</description>
   <fieldset submitButton="true" autoRun="true">
@@ -122,12 +122,76 @@
           <latest>$global_time.latest$</latest>
         </search>
         <option name="drilldown">none</option>
+        <option name="height">189</option>
         <option name="rangeColors">["0xf8be34","0xf1813f","0x53a051"]</option>
         <option name="rangeValues">[0,10]</option>
         <option name="refresh.display">progressbar</option>
         <option name="underLabel">Node Connections</option>
         <option name="useColors">1</option>
       </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <viz type="link_analysis_app.link_analysis">
+        <title>Connection Topology</title>
+        <search>
+          <query>index=$engagement$ src_ip=$candidate$
+| stats count by src_ip, dest_ip</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">433</option>
+        <option name="link_analysis_app.link_analysis.directed">false</option>
+        <option name="link_analysis_app.link_analysis.layoutStyle">concentric</option>
+        <option name="link_analysis_app.link_analysis.pathAlgo">dijkstra</option>
+        <option name="link_analysis_app.link_analysis.recursiveLookup">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+    <panel>
+      <title>Function codes to each node</title>
+      <viz type="network_topology.network_topology">
+        <search>
+          <query>index=$engagement$ src_ip=$candidate$
+| stats count by src_ip, dest_port, dest_ip, func</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="network_topology.network_topology.drilldown">false</option>
+        <option name="network_topology.network_topology.link1">READ_COILS</option>
+        <option name="network_topology.network_topology.link1Color">#ffc000</option>
+        <option name="network_topology.network_topology.link1Dashed">true</option>
+        <option name="network_topology.network_topology.link1Label">READ_COILS</option>
+        <option name="network_topology.network_topology.link2">READ_DISCRETE_INPUTS</option>
+        <option name="network_topology.network_topology.link2Color">#00b050</option>
+        <option name="network_topology.network_topology.link2Dashed">true</option>
+        <option name="network_topology.network_topology.link2Label">READ_DISCRETE_INPUTS</option>
+        <option name="network_topology.network_topology.link3">READ_INPUT_REGISTERS</option>
+        <option name="network_topology.network_topology.link3Color">#a5a5a5</option>
+        <option name="network_topology.network_topology.link3Dashed">false</option>
+        <option name="network_topology.network_topology.link3Label">READ_INPUT_REGISTERS</option>
+        <option name="network_topology.network_topology.link4">WRITE_MULTIPLE_COILS</option>
+        <option name="network_topology.network_topology.link4Color">#00b0f0</option>
+        <option name="network_topology.network_topology.link4Dashed">true</option>
+        <option name="network_topology.network_topology.link4Label">WRITE_MULTIPLE_COILS</option>
+        <option name="network_topology.network_topology.link5">link5</option>
+        <option name="network_topology.network_topology.link5Color">#c00000</option>
+        <option name="network_topology.network_topology.link5Dashed">false</option>
+        <option name="network_topology.network_topology.link5Label">Link 5</option>
+        <option name="network_topology.network_topology.unfocusOpacity">0.2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
     </panel>
   </row>
   <row>
