@@ -1,0 +1,305 @@
+<form theme="dark">
+  <label>Registry Explorer</label>
+  <fieldset submitButton="true" autoRun="true">
+    <input type="multiselect" token="evidence_file">
+      <label>1) Select Evidence File(s):</label>
+      <fieldForLabel>evidence_file</fieldForLabel>
+      <fieldForValue>evidence_file</fieldForValue>
+      <search>
+        <query>index="virtuoso_tzworks" | top 0 evidence_file</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+      <delimiter>  OR </delimiter>
+      <valuePrefix>evidence_file=</valuePrefix>
+    </input>
+    <input type="dropdown" token="registry_parser">
+      <label>2) Select Available Registry Parser:</label>
+      <fieldForLabel>provenance.command_id</fieldForLabel>
+      <fieldForValue>provenance.command_id</fieldForValue>
+      <search>
+        <query>index="virtuoso_tzworks" $evidence_file$
+| top 0 provenance.command_id
+| sort provenance.command_id</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+      <choice value="*">ALL</choice>
+      <default>*</default>
+    </input>
+    <input type="time" token="field1">
+      <label>3) Set Time Range:</label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>GLOBAL STATS / OVERVIEW</title>
+      <html depends="$evidence_file$">
+        <h1>
+          <b>Currently Selected Evidence: <font color="yellow">$evidence_file$</font>
+        </b>
+        </h1>
+      </html>
+      <table>
+        <title>*Usernames across all selected plugins</title>
+        <search id="evidence_metadata">
+          <query>index="virtuoso_plaso" $evidence_file$
+| eval host_name=upper(hostname)
+| stats earliest(_time) as "Earliest Event:", latest(_time) as "Latest Event:" count by evidence_file, host_name, extra.plaso.username
+| stats list(extra.plaso.username), list(count) list("Earliest Event:") list("Latest Event:") by evidence_file, host_name
+| rename host_name AS "Host Name(s):", extra.plaso.username AS "Associated User Name(s):", list(count) AS "Event Count:", evidence_file AS "Evidence File:", "list(Earliest Event:)" AS "Earliest Event:", "list(Latest Event:)" AS "Latest Event:"
+| fieldformat "Earliest Event:"=strftime('Earliest Event:', "%c")
+| fieldformat "Latest Event:"=strftime('Latest Event:', "%c")
+| sort -"Event Count:"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">15</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="host_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="host_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Host Name(s):">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="host_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="host_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Host Name(s):">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Associated User Name(s):">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Event Count:">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="evidence_file">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Evidence File:">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <search>
+          <query>index="virtuoso_plaso" $evidence_file$ extra.plaso.username!=NULL
+| timechart span=1w count by extra.plaso.username</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Evidence Account Activity Timeline</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">log</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="text" token="table_search" searchWhenChanged="true">
+        <label>Artifact Keyword Search:</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+        <prefix>*</prefix>
+        <suffix>*</suffix>
+      </input>
+      <html depends="$registry_parser$">
+        <h1>
+          <b>Currently Selected Parser: <font color="cyan"> $registry_parser$ </font>
+        </b>
+        </h1>
+      </html>
+      <table>
+        <search id="artifact_base">
+          <query>index="virtuoso_tzworks" $evidence_file$ extra.tzworks.registry_key=* provenance.command_id=$registry_parser$ extra.tzworks.artifact_type=$table_search$
+| stats values(extra.tzworks.registry_key) count by extra.tzworks.artifact_type, provenance.command_id
+| rename values(extra.tzworks.registry_key) AS "Registry Key(s):", extra.tzworks.artifact_type AS "Artifact Type:", provenance.command_id AS "Registry Parser:"
+| sort -count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">15</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="extra.tzworks.artifact_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.artifact_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="provenance.command_id">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.artifact_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.artifact_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="Artifact Type:">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="provenance.command_id">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Registry Parser:">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <drilldown>
+          <set token="artifact_selection">$click.value$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="text" token="event_keyword" searchWhenChanged="true">
+        <label>Event Keywork Search:</label>
+        <default>*</default>
+        <initialValue>*</initialValue>
+        <prefix>*</prefix>
+        <suffix>*</suffix>
+      </input>
+      <html depends="$artifact_selection$">
+        <h1>
+          <b>Currently Selected Parser: <font color="orange"> $artifact_selection$ </font>
+        </b>
+        </h1>
+      </html>
+      <table>
+        <search id="event_view_base">
+          <query>index="virtuoso_tzworks" $evidence_file$ extra.tzworks.artifact_type="$artifact_selection$" "$event_keyword$"
+| streamstats count as Id
+| stats values(*) as * by Id
+| table timestamp, extra.tzworks.*
+| fields - extra.tzworks.csv_src, extra.tzworks.origin_file, extra.tzworks.tool_used, extra.tzworks.orig_runtime, extra.tzworks.dynamic_info, extra.tzworks.artifact_type</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="count">50</option>
+        <option name="drilldown">row</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">false</option>
+        <drilldown>
+          <set token="field_select">$click.name2$</set>
+          <set token="value_select">$click.value2$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html depends="$field_select$">
+        <h1>
+          <b>Current Event Selection: <font color="GreenYellow"> $field_select$=$value_select$ </font>
+        </b>
+        </h1>
+      </html>
+      <event>
+        <title>Note: may need to escape "\"'s in target search</title>
+        <search base="event_view_base">
+          <query>| search $field_select$="$value_select$"</query>
+        </search>
+        <option name="count">100</option>
+        <option name="list.drilldown">none</option>
+        <option name="maxLines">20</option>
+        <option name="raw.drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">1</option>
+        <option name="table.drilldown">none</option>
+        <option name="type">list</option>
+      </event>
+    </panel>
+  </row>
+</form>
