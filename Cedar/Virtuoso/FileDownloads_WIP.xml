@@ -1,0 +1,147 @@
+<form theme="dark">
+  <label>File Downloads</label>
+  <description>Please Select an Evidence File</description>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="multiselect" token="evidence_file" searchWhenChanged="false">
+      <label>Evidence File</label>
+      <fieldForLabel>file_short</fieldForLabel>
+      <fieldForValue>evidence_file</fieldForValue>
+      <search>
+        <query>|tstats count where index="virtuoso*" NOT index="virtuoso_fileinfo" by evidence_file | rex field=evidence_file "(?P&lt;file_short&gt;[^\/]+)$"</query>
+        <earliest>0</earliest>
+        <latest></latest>
+      </search>
+      <valuePrefix>evidence_file="</valuePrefix>
+      <valueSuffix>"</valueSuffix>
+      <delimiter> OR </delimiter>
+      <choice value="*">All</choice>
+    </input>
+    <input type="time" token="time_picker">
+      <label>Time/Date</label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="event_keyword" searchWhenChanged="true">
+      <label>Event Keyword</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+        <h1>
+          <b>
+            <font color="BlueViolet">Chrome History - File Downloads</font>
+          </b>
+        </h1>
+      </html>
+      <table>
+        <title>Files downloaded using Google Chrome</title>
+        <search>
+          <query>index="virtuoso_plaso" extra.plaso.parser="sqlite/chrome_27_history" "extra.plaso.data_type"="chrome:history:file_downloaded" $evidence_file$ "$event_keyword$" | streamstats count as Id | stats values(*) as * by Id | eval file_size_desc=case('extra.plaso.total_bytes'&lt;=100000, "small", 'extra.plaso.total_bytes'&gt;100000 AND 'extra.plaso.total_bytes'&lt;=10000000, "medium",    'extra.plaso.total_bytes'&gt;10000000, "large") | table timestamp, extra.plaso.full_path, extra.plaso.total_bytes, file_size_desc, extra.plaso.url.full | eventstats sum(count) as _total</query>
+          <earliest>$time_picker.earliest$</earliest>
+          <latest>$time_picker.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">false</option>
+        <format type="color" field="extra.plaso.full_path">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="file_size_desc">
+          <colorPalette type="map">{"small":#4FA484,"medium":#EDD051,"large":#AF575A}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+   <row>
+    <panel>
+      <html>
+        <h1>
+          <b>
+            <font color="BlueViolet">Firefox History - File Downloads</font>
+          </b>
+        </h1>
+      </html>
+      <table>
+        <title>Files downloaded using Firefox</title>
+        <search>
+          <query>index="virtuoso_plaso" extra.plaso.parser="sqlite/chrome_27_history" "extra.plaso.data_type"="chrome:history:file_downloaded" $evidence_file$ "$event_keyword$" | streamstats count as Id | stats values(*) as * by Id | eval file_size_desc=case('extra.plaso.total_bytes'&lt;=100000, "small", 'extra.plaso.total_bytes'&gt;100000 AND 'extra.plaso.total_bytes'&lt;=10000000, "medium",    'extra.plaso.total_bytes'&gt;10000000, "large") | table timestamp, extra.plaso.full_path, extra.plaso.total_bytes, file_size_desc, extra.plaso.url.full | eventstats sum(count) as _total</query>
+          <earliest>$time_picker.earliest$</earliest>
+          <latest>$time_picker.latest$</latest>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">false</option>
+        <format type="color" field="extra.plaso.full_path">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="file_size_desc">
+          <colorPalette type="map">{"small":#4FA484,"medium":#EDD051,"large":#AF575A}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h1>
+          <b>
+            <font color="BlueViolet">Open/Save MRU | $total$</font>
+          </b>
+        </h1>
+      </html>
+      <table>
+        <title>Files that have been opened or saved within a Windows shell dialog box</title>
+        <search>
+          <query>index=virtuoso_tzworks "extra.tzworks.artifact_type"="Open/Save MRU" $evidence_file$ "$event_keyword$" | stats count by timestamp, extra.tzworks.name, extra.tzworks.item | eventstats sum(count) as _total</query>
+          <earliest>$time_picker.earliest$</earliest>
+          <latest>$time_picker.latest$</latest>
+          <preview>
+            <set token="total">$result._total$</set>
+          </preview>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="extra.tzworks.name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h1>
+          <b>
+            <font color="BlueViolet">$MFT Zone Identifier 3</font>
+          </b>
+        </h1>
+      </html>
+      <table>
+        <title>Files marked with an ADS of ZoneID 3</title>
+        <search>
+          <query>index=virtuoso_tzworks "{'ZoneId':'3 [internet]'}" $evidence_file$ "$event_keyword$" | table timestamp, file.full, extra.tzworks.notes, extra.tzworks.macb | sort timestamp desc</query>
+          <earliest>$time_picker.earliest$</earliest>
+          <latest>$time_picker.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="file.full">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.macb">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>

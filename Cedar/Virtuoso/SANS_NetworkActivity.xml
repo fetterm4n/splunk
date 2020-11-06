@@ -1,0 +1,634 @@
+<form theme="dark">
+  <label>Network Activity / Physical Location</label>
+  <description>SANS Windows Artifact Analysis - https://www.sans.org/security-resources/posters/windows-forensic-analysis/170/download</description>
+  <fieldset submitButton="true">
+    <input type="dropdown" token="evidence_file">
+      <label>Evidence File:</label>
+      <fieldForLabel>evidence_file</fieldForLabel>
+      <fieldForValue>evidence_file</fieldForValue>
+      <search>
+        <query>index="virtuoso_tzworks" | top 0 evidence_file</query>
+      </search>
+    </input>
+    <input type="time" token="field1">
+      <label>Time Selection:</label>
+      <default>
+        <earliest>0</earliest>
+        <latest></latest>
+      </default>
+    </input>
+    <input type="text" token="event_keyword">
+      <label>Event Keyword:</label>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html>
+	      <hr style="border:1px solid orange;"/>
+	      <div style="text-align:center;font-style:bold;color:orange;font-size:175%">Timezone:</div>
+          <br/>
+          <b>Description:</b>  Identifies the current system time zone.<br/>
+          <b>Location:</b>  SYSTEM Hive:   SYSTEM\CurrentControlSet\Control\TimeZoneInformation<br/>
+          <b>Interpretation:</b>
+         <ul>
+            <li> Time activity is incredibly useful for correlation of activity   </li>
+            <li> Internal log files and date/timestamps will be based on the system time zone information</li>
+            <li> You might have other network devices and you will need to correlate information to the time zone information collected here.</li>
+        </ul>
+        <h3>
+          <b>
+            <font color="orange">TZworks Artifacts:</font>
+          </b>
+        </h3>
+      </html>
+      <table>
+        <search>
+          <query>index="virtuoso_tzworks" evidence_file=$evidence_file$ "$event_keyword$" "extra.tzworks.artifact_type"="Timezone Info"
+| table _time, extra.tzworks.value_name, extra.tzworks.value_data</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">15</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">true</option>
+        <format type="color" field="extra.tzworks.registry_key">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.registry_key">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.subkey">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.value_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h3>
+          <b>
+            <font color="orange">Plaso Artifacts:</font>
+          </b>
+        </h3>
+      </html>
+      <table>
+        <search>
+          <query>index="virtuoso_plaso" evidence_file=$evidence_file$ "extra.plaso.data_type"="windows:registry:timezone" "$event_keyword$"
+| table hostname, extra.plaso.data_type, extra.plaso.message</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">15</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="extra.plaso.hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.plaso.hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="winregkey.full">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.plaso.data_type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+	      <hr style="border:1px solid orange;"/>
+	      <div style="text-align:center;font-style:bold;color:orange;font-size:175%">Cookies:</div>
+      <br/>
+          <font color="White">
+          <b>Description:  </b>Cookies give insight into what websites have been visited and what activities may have taken place there.<br/>
+          <b>Location:  </b>
+          <br/>
+          Internet Explorer<br/>
+              <ul>
+            <li> IE6-8:%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Cookies</li>
+            <li> IE10: %USERPROFILE%\AppData\Roaming\Microsoft\Windows\Cookies</li>
+            <li> IE11: %USERPROFILE%\AppData\Local\Microsoft\Windows\INetCookies</li>
+        </ul>
+        Firefox
+        <ul>
+            <li> XP:%USERPROFILE%\Application Data\Mozilla\Firefox\Profiles\[random text].default\cookies.sqlite</li>
+            <li> Win7/8/10:%USERPROFILE%\AppData\Roaming\Mozilla\Firefox\Profiles\[random text].default\cookies.sqlite</li>
+        </ul>
+        Chrome:
+         <ul>
+            <li> XP:%USERPROFILE%\Local Settings\ApplicationData\Google\Chrome\User Data\Default\Local Storage</li>
+            <li> Win7/8/10:%USERPROFILE%\AppData\Local\Google\Chrome\User Data\Default\Local Storage</li>
+        </ul>
+        </font>
+        <h3>
+          <b>
+            <font color="orange">Internet Explorer:</font>
+          </b>
+        </h3>
+    </html>
+      <table>
+        <search>
+          <query>index="virtuoso_tzworks" evidence_file=$evidence_file$ file.full=*\\Microsoft\\*Cookies "$event_keyword$"
+| table _time, file.full</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="timestamp_desc">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="timestamp_desc">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="file.full">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h3>
+          <b>
+            <font color="orange">Firefox:</font>
+          </b>
+        </h3>
+      </html>
+      <table>
+        <search>
+          <query>index="virtuoso_tzworks" evidence_file=$evidence_file$ file.full=*\\Mozilla\\cookies.sqllite "$event_keyword$"
+| table _time, file.full</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.plaso.message">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h3>
+          <b>
+            <font color="orange">Chrome:</font>
+          </b>
+        </h3>
+      </html>
+      <table>
+        <search>
+          <query>index="virtuoso_tzworks" evidence_file=$evidence_file$ file.full=*\\Google\\Chrome\\*Cookies "$event_keyword$"
+| table _time, file.full</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.plaso.message">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="file.full">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+	      <hr style="border:1px solid orange;"/>
+	      <div style="text-align:center;font-style:bold;color:orange;font-size:175%">Network History:</div>
+      <br/>
+          <font color="White">
+          <b>Description:  </b>
+          <br/>
+            <ul>
+            <li> Identify networks that the computer has been connected to</li>
+            <li> Networks could be wireless or wired</li>
+            <li> Identify domain name/intranet name</li>
+            <li> Identify SSID</li>
+            <li> Identify Gateway MAC Address</li>
+        </ul>
+          <b>Location:  </b>
+          <br/>
+          Win7/8/10 SOFTWARE HIVE:<br/>
+          <ul>
+            <li> SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Signatures\Unmanagede</li>
+            <li> SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Signatures\Managed</li>
+            <li> SOFTWARE\Microsoft\Windows NT\CurrentVersion\NetworkList\Nla\Cach</li>
+
+        </ul>
+          <b>Interpretation:  </b>
+         <ul>
+            <li> Identifying intranets and networks that a computer has connected to is incredibly important.</li>
+            <li> Not only can you determine the intranet name, you can determine the last time the network was connected to it based on the last write time of the key</li>
+            <li> This will also list any networks that have been connected to via a VPN</li>
+            <li> MAC Address of SSID for Gateway could be physically triangulated</li>
+        </ul>
+        </font>
+        <h3>
+          <b>
+            <font color="orange">TZworks Artifacts:</font>
+          </b>
+        </h3>
+    </html>
+      <table>
+        <search>
+          <query>index="virtuoso_tzworks" evidence_file=$evidence_file$ "$event_keyword$"
+    "extra.tzworks.registry_key"="HKLM/Software/Microsoft/Windows NT/CurrentVersion/NetworkList/Signatures/?*/?* [targeting certain values]"
+| table _time, extra.tzworks.description, extra.tzworks.default_gateway_mac, extra.tzworks.dns_suffix, extra.tzworks.profile_guid</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">false</option>
+        <format type="color" field="timestamp_desc">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h3>
+          <b>
+            <font color="orange">Plaso Artifacts:</font>
+          </b>
+        </h3>
+      </html>
+      <table>
+        <search>
+          <query>index="virtuoso_plaso" evidence_file=$evidence_file$ "$event_keyword$"
+    registry_path="HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\NetworkList*"
+| table _time, hostname, extra.plaso.key_path, extra.plaso.message, extra.plaso.values</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.plaso.key_path">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+	      <hr style="border:1px solid orange;"/>
+	      <div style="text-align:center;font-style:bold;color:orange;font-size:175%">WLAN Event Log:</div>
+
+      <br/>
+          <font color="White">
+          <b>Description:  </b>Determine what wireless networks the system associated with and identify network characteristics to find location<br/>
+          <b>Relevant Event IDs</b>
+          <ul>
+            <li> 11000 – Wireless network association started</li>
+            <li> 8001 – Successful connection to wireless network</li>
+            <li> 8002 – Failed connection to wireless network</li>
+            <li> 8003 – Disconnect from wireless network</li>
+            <li> 6100 – Network diagnostics (System log)</li>
+          </ul>
+          <b>Location:  </b>
+          <br/>
+          Microsoft-Windows-WLAN-AutoConfig Operational.evtx<br/>
+          <b>Interpretation:  </b>
+          <br/>
+         <ul>
+            <li> Shows historical record of wireless network connections</li>
+            <li> Contains SSID and BSSID (MAC address), which can be used to geolocate wireless access point *(no BSSID on Win8+)</li>
+        </ul>
+        </font>
+        <h3>
+          <b>
+            <font color="orange">Windows WLAN Event Logs:</font>
+          </b>
+        </h3>
+    </html>
+      <table>
+        <search>
+          <query>sourcetype=WinEventLog* evidence_file=$evidence_file$ (EventCode=11000 OR EventCode=8001 OR EventCode=8002 OR EventCode=8003 OR EventCode=6100) "$event_keyword$"
+| table _time, EventCode, Message</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="extra.tzworks.registry_key">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+	      <hr style="border:1px solid orange;"/>
+	      <div style="text-align:center;font-style:bold;color:orange;font-size:175%">Browser Search Terms:</div>
+
+      <br/>
+          <font color="White">
+          <b>Description:  </b>
+          <ul>
+            <li>  Windows Application Compatibility Database is used by Windows to identify possible application compatibility challenges with executables</li>
+            <li>  Tracks the executables file name, file size, last modified time, and in Windows XP the last update time</li>
+          </ul>
+          <b>Location:  </b>XP:   SYSTEM\CurrentControlSet\Control\SessionManager\AppCompatibility<br/> Windows 7/8/10: SYSTEM\CurrentControlSet\Control\Session Manager\AppCompatCache<br/>
+          <b>Interpretation:  </b> Any executable run on the Windows system could be found in this key. You can use this key to identify systems that specific malware was executed on. In addition, based on the interpretation of the time-based data you might be able to determine the last time of execution or activity on the system<br/>
+         <ul>
+            <li> Windows XP contains at most 96 entries  -   LastUpdateTime is updated when the files are execute</li>
+            <li>   Windows 7 contains at most 1,024 entries  - LastUpdateTime does not exist on Win7 systems</li>
+        </ul>
+        </font>
+        <h3>
+          <b>
+            <font color="orange">TZworks Artifacts:</font>
+          </b>
+        </h3>
+    </html>
+      <table>
+        <search>
+          <query>index="virtuoso_tzworks" evidence_file=$evidence_file$ "Session Manager" OR "SessionManager" extra.tzworks.value_name=* "$event_keyword$"
+| table _time, extra.tzworks.registry_key, extra.tzworks.value_name, extra.tzworks.value_data</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <format type="color" field="extra.tzworks.target_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.target_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.plaso.key_path">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.registry_key">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.target_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.target_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.plaso.key_path">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.registry_key">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="extra.tzworks.value_name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h3>
+          <b>
+            <font color="orange">Plaso Artifacts:</font>
+          </b>
+        </h3>
+      </html>
+      <table>
+        <search>
+          <query>index="virtuoso_plaso" evidence_file=$evidence_file$ "Session Manager" OR "SessionManager"
+| table _time, hostname, file.full</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="file.full">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+	      <hr style="border:1px solid orange;"/>
+	      <div style="text-align:center;font-style:bold;color:orange;font-size:175%">System Resource Usage Monitor (SRUM):</div>
+      <br/>
+          <font color="White">
+          <b>Description:  </b>Records 30 to 60 days of historical system performance. Applications run, user account responsible for each, and application and bytes sent/received per application per hour.<br/>
+          <b>Location:  </b>SOFTWARE\Microsoft\WindowsNT\CurrentVersion\SRUM\Extensions {d10ca2fe-6fcf-4f6d-848e-b2e99266fa89} = Application Resource Usage Provider C:\Windows\System32\SRU\e<br/>
+          <b>Interpretation:  </b> Any executable run on the Windows system could be found in this key. You can use this key to identify systems that specific malware was executed on. In addition, based on the interpretation of the time-based data you might be able to determine the last time of execution or activity on the system<br/>
+         <ul>
+            <li>Use tool such as <b>srum_dump.exe</b> to cross correlate the data between the registry keys and the SRUM ESE Database. </li>
+        </ul>
+        </font>
+        <h3>
+          <b>
+            <font color="orange">TZworks Artifacts:</font>
+          </b>
+        </h3>
+    </html>
+      <event>
+        <search>
+          <query>index="virtuoso_tzworks" evidence_file=$evidence_file$ "SRUM" "$event_keyword$"</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="list.drilldown">full</option>
+        <option name="list.wrap">1</option>
+        <option name="maxLines">5</option>
+        <option name="raw.drilldown">full</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">0</option>
+        <option name="table.drilldown">none</option>
+        <option name="table.sortDirection">asc</option>
+        <option name="table.wrap">1</option>
+        <option name="type">table</option>
+      </event>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+        <h3>
+          <b>
+            <font color="orange">Plaso Artifacts:</font>
+          </b>
+        </h3>
+      </html>
+      <table>
+        <search>
+          <query>index="virtuoso_plaso" evidence_file=/mnt/smb/data/evidence/disk_images/LoneWolf.E01 extra.plaso.key_path=*\\SRUM\\* "$event_keyword$"
+| table _time, hostname, extra.plaso.message, file_hash</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="hostname">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="file_hash">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>
