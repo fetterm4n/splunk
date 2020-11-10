@@ -1,0 +1,238 @@
+<form theme="dark">
+  <label>VEGA ✧</label>
+  <description>[ Visualization Explorer for Graph Analytics ]</description>
+  <fieldset submitButton="false" autoRun="false"></fieldset>
+  <row>
+    <panel>
+      <input type="dropdown" token="index" searchWhenChanged="true">
+        <label>Engagement:</label>
+        <fieldForLabel>index</fieldForLabel>
+        <fieldForValue>index</fieldForValue>
+        <search>
+          <query>|tstats count by index</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <default>ics-defcon23</default>
+        <prefix>index=</prefix>
+      </input>
+      <input type="multiselect" token="proto">
+        <label>Protocol</label>
+        <choice value="445">SMB</choice>
+        <choice value="*">All</choice>
+        <choice value="502">Modbus</choice>
+        <choice value="80">HTTP</choice>
+        <choice value="443">TLS</choice>
+        <choice value="53">DNS (53)</choice>
+        <choice value="5353">DNS (5353)</choice>
+        <default>*</default>
+        <initialValue>*</initialValue>
+        <valuePrefix>dest_port="</valuePrefix>
+        <valueSuffix>"</valueSuffix>
+        <delimiter> OR </delimiter>
+      </input>
+      <input type="time" token="global_time">
+        <label>Time Select</label>
+        <default>
+          <earliest>0</earliest>
+          <latest></latest>
+        </default>
+      </input>
+      <input type="checkbox" token="D_A" searchWhenChanged="true">
+        <label>Force Directed Graph:</label>
+        <choice value="enabled">Directional Arrows</choice>
+        <delimiter> </delimiter>
+        <initialValue>enabled</initialValue>
+      </input>
+      <input type="checkbox" token="P_Z">
+        <label></label>
+        <choice value="enabled">Enable Pan / Zoom</choice>
+      </input>
+      <viz type="force_directed_viz.force_directed">
+        <title>Node Size aligns with Connection Count, Link color with Traffic Amount</title>
+        <search>
+          <query>$index$ src_ip!="-" AND src_ip!="::" $proto$
+| stats count by src_ip, dest_ip</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="force_directed_viz.force_directed.AttractDistanceMax">400</option>
+        <option name="force_directed_viz.force_directed.AttractDistanceMin">120</option>
+        <option name="force_directed_viz.force_directed.AttractForceStrength">-700</option>
+        <option name="force_directed_viz.force_directed.CollisionIterations">1</option>
+        <option name="force_directed_viz.force_directed.CollisionRadius">45</option>
+        <option name="force_directed_viz.force_directed.CollisionStrength">0.9</option>
+        <option name="force_directed_viz.force_directed.ColorRange1">100</option>
+        <option name="force_directed_viz.force_directed.ColorRange1Code">#dc4e41</option>
+        <option name="force_directed_viz.force_directed.ColorRange2">500</option>
+        <option name="force_directed_viz.force_directed.ColorRange2Code">#f8be34</option>
+        <option name="force_directed_viz.force_directed.ColorRange3">1000</option>
+        <option name="force_directed_viz.force_directed.ColorRange3Code">#53a051</option>
+        <option name="force_directed_viz.force_directed.ColorRange4">10000</option>
+        <option name="force_directed_viz.force_directed.ColorRange4Code">#53a051</option>
+        <option name="force_directed_viz.force_directed.ColorRange5">1000000</option>
+        <option name="force_directed_viz.force_directed.ColorRange5Code">#53a051</option>
+        <option name="force_directed_viz.force_directed.ForceCollision">20</option>
+        <option name="force_directed_viz.force_directed.LineColor">enabled</option>
+        <option name="force_directed_viz.force_directed.LinkDistance">150</option>
+        <option name="force_directed_viz.force_directed.LinkLength">1</option>
+        <option name="force_directed_viz.force_directed.PanZoom">$P_Z$</option>
+        <option name="force_directed_viz.force_directed.RepelDistanceMax">200</option>
+        <option name="force_directed_viz.force_directed.RepelDistanceMin">100</option>
+        <option name="force_directed_viz.force_directed.RepelForceStrength">-200</option>
+        <option name="force_directed_viz.force_directed.SWRange1">1</option>
+        <option name="force_directed_viz.force_directed.SWRange2">1</option>
+        <option name="force_directed_viz.force_directed.SWRange3">1</option>
+        <option name="force_directed_viz.force_directed.SWRange4">1</option>
+        <option name="force_directed_viz.force_directed.SWRange5">1</option>
+        <option name="force_directed_viz.force_directed.arrows">$D_A$</option>
+        <option name="force_directed_viz.force_directed.lowerRange">5</option>
+        <option name="force_directed_viz.force_directed.nodeFontSize">14</option>
+        <option name="force_directed_viz.force_directed.theme">dark</option>
+        <option name="force_directed_viz.force_directed.upperRange">15</option>
+        <option name="height">824</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Graph Analytic Measures Centrality - IDEA -- enriched device identification lookup panel next to each of these. use Base search to improve performance here.</title>
+      <chart>
+        <title>Eigenvector Centrality: measures how many other nodes are connected to the Target Source IP. These may reflect Master nodes with high number of Outstation connections.</title>
+        <search>
+          <query>$index$ $proto$
+| stats count by src_ip, dest_ip
+| fit GraphCentrality src_ip dest_ip compute="eigenvector_centrality"
+| table src_ip eigenvector_centrality
+| dedup src_ip
+| sort 10 - eigenvector_centrality</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Source IP</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.text">Eigenvector Centrality</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Betweenness Centrality: measures of how many of the shortest routes through the network flow through the Target IP. These may indicate key hubs for network traffic monitoring.</title>
+        <search>
+          <query>$index$ src_ip!="::" $proto$
+| stats count by src_ip, dest_ip
+| fit GraphCentrality src_ip dest_ip compute="betweenness_centrality"
+| table src_ip betweenness_centrality
+| dedup src_ip
+| sort 10 - betweenness_centrality</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisTitleX.text">Source IP</option>
+        <option name="charting.axisTitleY.text">Betweenness Centrality</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="dropdown" token="color_mode">
+        <label>Color mode:</label>
+        <choice value="sequential">Sequential</choice>
+        <choice value="categorical">Categorical</choice>
+        <default>sequential</default>
+        <initialValue>sequential</initialValue>
+      </input>
+      <input type="checkbox" token="S_R_L">
+        <label>Link options:</label>
+        <choice value="true">Self-referential links</choice>
+        <delimiter> </delimiter>
+      </input>
+      <input type="checkbox" token="B_L" searchWhenChanged="true">
+        <label></label>
+        <choice value="true">Backwards links</choice>
+        <delimiter> </delimiter>
+      </input>
+      <input type="radio" token="B_L_F">
+        <label>Backwards Link Format:</label>
+        <choice value="true">Dashed</choice>
+        <choice value="false">Solid</choice>
+      </input>
+      <viz type="sankey_diagram_app.sankey_diagram">
+        <title>Alluvial Network Flow</title>
+        <search>
+          <query>$index$ src_ip!="-" AND src_ip!="::" AND src_ip!=f* $proto$
+| stats count by src_ip, dest_ip
+| sort -count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">550</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="sankey_diagram_app.sankey_diagram.colorMode">$color_mode$</option>
+        <option name="sankey_diagram_app.sankey_diagram.maxColor">#3fc77a</option>
+        <option name="sankey_diagram_app.sankey_diagram.minColor">#f8be34</option>
+        <option name="sankey_diagram_app.sankey_diagram.numOfBins">9</option>
+        <option name="sankey_diagram_app.sankey_diagram.showBackwards">$B_L$</option>
+        <option name="sankey_diagram_app.sankey_diagram.showLabels">true</option>
+        <option name="sankey_diagram_app.sankey_diagram.showLegend">true</option>
+        <option name="sankey_diagram_app.sankey_diagram.showSelf">$S_R_L$</option>
+        <option name="sankey_diagram_app.sankey_diagram.showTooltip">true</option>
+        <option name="sankey_diagram_app.sankey_diagram.styleBackwards">$B_L_F$</option>
+        <option name="sankey_diagram_app.sankey_diagram.useColors">true</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+  </row>
+</form>
