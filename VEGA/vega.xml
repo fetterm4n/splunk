@@ -10,23 +10,23 @@
   <row depends="$alwaysHideCSSSection$">
     <panel>
       <html>
-                <style>
+				<style>
           h1.dashboard-header-title{
             visibility:hidden;
           }
         </style>
-            </html>
+			</html>
     </panel>
   </row>
   <row>
     <panel>
       <html>
-                <span style="font-size: 45px; color: #ccffff; font-family:Palatino;">VEGA</span>
-                <span style="font-size: 45px; color: #ffff99;">✧  </span>
-                <span style="font-size: 16px; color: ffffff;">
-          <b>[ Visualization Explorer for Graph-based Analytics ]</b>
-        </span>
-            </html>
+				<span style="font-size: 45px; color: #ccffff; font-family:Palatino;">VEGA</span>
+				<span style="font-size: 45px; color: #ffff99;">✧  </span>
+				<span style="font-size: 16px; color: ffffff;">
+					<b>[ Visualization Explorer for Graph-based Analytics ]</b>
+				</span>
+			</html>
     </panel>
   </row>
   <row>
@@ -92,35 +92,37 @@
         <initialValue>40</initialValue>
       </input>
       <html>
-          <ul>
-          <li>
-            <b>Node colors</b> are similarly clustered based on their number of inbound connections.<br/>
-          </li>
-          <li>
-            <b>Link colors</b> are determined by their volume of events:</li>
-          </ul>
-            <center>
-          <table style="width:50%" border="0">
-          <tr>
-            <th>
-              <span style="font-size: 14px; color: #f0f4ed;"> 1 - 100 Events</span>
-            </th>
-            <th>
-              <span style="font-size: 14px; color: #63ffcf;"> 101 - 500 Events</span>
-            </th>
-            <th>
-              <span style="font-size: 14px; color: #07a9ff;"> 501 - 1,000 Events</span>
-            </th>
-            <th>
-              <span style="font-size: 14px; color: #8707ff;"> 1,001 - 10,000 Events</span>
-            </th>
-            <th>
-              <span style="font-size: 14px; color: #f8be34;"> &gt;10,000 Events</span>
-            </th>
-          </tr>
-          </table>
-        </center>
-      </html>
+				<ul>
+					<li>
+						<b>Node colors</b> are similarly clustered based on their number of inbound connections.
+						<br/>
+					</li>
+					<li>
+						<b>Link colors</b> are determined by their volume of events:
+					</li>
+				</ul>
+				<center>
+					<table style="width:50%" border="0">
+						<tr>
+							<th>
+								<span style="font-size: 14px; color: #f0f4ed;"> 1 - 100 Events</span>
+							</th>
+							<th>
+								<span style="font-size: 14px; color: #63ffcf;"> 101 - 500 Events</span>
+							</th>
+							<th>
+								<span style="font-size: 14px; color: #07a9ff;"> 501 - 1,000 Events</span>
+							</th>
+							<th>
+								<span style="font-size: 14px; color: #8707ff;"> 1,001 - 10,000 Events</span>
+							</th>
+							<th>
+								<span style="font-size: 14px; color: #f8be34;"> &gt;10,000 Events</span>
+							</th>
+						</tr>
+					</table>
+				</center>
+			</html>
       <viz type="force_directed_viz.force_directed">
         <search>
           <query>$index$ src_ip!="-" AND src_ip!="::" $proto$
@@ -175,13 +177,15 @@
   <row>
     <panel depends="$panel_show$">
       <html>
-            <hr style="border:1px solid #ccffff;"/>
-            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Networked Device Identification:</div>
-             <ul>
-              <li>
-            These devices were identified using by matching the <b>organizationally unique identifier (OUI)</b>, extracted from the first 24 bits of identified MAC addresses.  </li>
-            </ul>
-      </html>
+				<hr style="border:1px solid #ccffff;"/>
+				<div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Networked Device Identification:</div>
+				<ul>
+					<li>
+            These devices were identified using by matching the
+						<b>organizationally unique identifier (OUI)</b>, extracted from the first 24 bits of identified MAC addresses.
+					</li>
+				</ul>
+			</html>
       <table>
         <search>
           <query>$index$ $proto$ orig_l2_addr=*
@@ -218,23 +222,26 @@
   <row>
     <panel>
       <html>
-            <hr style="border:1px solid #ccffff;"/>
-            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Graph Centrality Measures:</div>
-                                 <ul>
-                                <li>
-            <b>
+				<hr style="border:1px solid #ccffff;"/>
+				<div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Graph Centrality Measures:</div>
+				<ul>
+					<li>
+						<b>
               Eigenvector Centrality:
-            </b>measures how many other nodes are connected to the Target Source IP. These may reflect Master nodes with high number of Outstation connections.</li>
-                                <li>
-            <b>
+            </b>measures how many other nodes are connected to the Target Source IP. These may reflect Master nodes with high number of Outstation connections.
+					</li>
+					<li>
+						<b>
               Betweenness Centrality:
-            </b>measures of how many of the shortest routes through the network flow through the Target IP. These may indicate key hubs for network traffic monitoring.</li>
-                                <li>
-            <b>
+            </b>measures of how many of the shortest routes through the network flow through the Target IP. These may indicate key hubs for network traffic monitoring.
+					</li>
+					<li>
+						<b>
               Local Clustering Coefficient:
-            </b>measure of the degree to which nodes in a graph tend to cluster together. The Local coefficient measures the embeddedness of a node.</li>
-                            </ul>
-      </html>
+            </b>measure of the degree to which nodes in a graph tend to cluster together. The Local coefficient measures the embeddedness of a node.
+					</li>
+				</ul>
+			</html>
     </panel>
   </row>
   <row>
@@ -320,24 +327,27 @@
   <row>
     <panel>
       <html>
-            <hr style="border:1px solid #ccffff;"/>
-            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Minimum Spanning Tree</div>
-        <i>Minimum Spanning Tree Algorithm:</i>
-            <ul>
-                  <li>Uses a calculated weight of edges to eliminate <i>cycles</i> (redundant loops) in the graph.</li>
-                  <li>Results in a graphed <i>spine</i> of the network.</li>
-
-           </ul>
-      </html>
+				<hr style="border:1px solid #ccffff;"/>
+				<div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Minimum Spanning Tree</div>
+				<ul>
+					<li>Uses calculated weight of edges to eliminate
+						<i>cycles</i> (redundant loops) in the graph.
+					</li>
+					<li>Produces a graphed
+						<i>spine</i> of the network, i.e., the minimum links required to connect all the vertices together.
+					</li>
+				</ul>
+			</html>
       <viz type="splunk-3D-graph-network-topology-viz.3d_graph_network_topology_viz">
         <search>
-          <query>index=4s_ics | stats count by src_ip dest_ip
+          <query>$index$ $proto$
+| stats count by src_ip dest_ip
 | fit GraphCentrality src_ip dest_ip compute="eigenvector_centrality,betweenness_centrality"
 | eval col00 = "#00AA00"
 | eval colX0 = "#FF0000"
 | eval col0Y = "#FFFF00"
 | eval colXY = "#FFA500"
-`bilinearInterpolateColorGradient(betweenness_centrality, eigenvector_centrality, col00, colX0, col0Y, colXY, "color_src")`
+    `bilinearInterpolateColorGradient(betweenness_centrality, eigenvector_centrality, col00, colX0, col0Y, colXY, "color_src")`
 | eval weight_dest=0.5, edge_weight=1
 | fields - col00 colX0 col0Y colXY
 | eventstats max(count) as max_count
@@ -345,9 +355,12 @@
 | fit MinimumSpanningTree src_ip dest_ip weight=weight
 | sort - src_ip</query>
           <earliest>0</earliest>
+          <latest></latest>
           <sampleRatio>1</sampleRatio>
         </search>
         <option name="drilldown">none</option>
+        <option name="height">468</option>
+        <option name="refresh.display">progressbar</option>
         <option name="trellis.enabled">0</option>
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
@@ -357,13 +370,13 @@
   <row>
     <panel>
       <html>
-            <hr style="border:1px solid #ccffff;"/>
-            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Network Flow</div>
-             <ul>
-              <li>
+				<hr style="border:1px solid #ccffff;"/>
+				<div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Network Flow</div>
+				<ul>
+					<li>
             Use the Sankey diagram to explore the volume of network traffic flow through the network.</li>
-            </ul>
-      </html>
+				</ul>
+			</html>
     </panel>
   </row>
   <row>
@@ -421,18 +434,40 @@
   </row>
   <row>
     <panel>
-            <html>
-            <hr style="border:1px solid #ccffff;"/>
-            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Cluster Analysis</div>
-             <ul>
-              <li>Use <i>X</i>, <i>Y</i>, and <i>Z</i> to control the graphing inputs to use for clustering</li>
-              <li>
-            Adjust the <i>k-value</i> to control the number of clusters </li>
-            </ul>
-      </html>
+      <html>
+				<hr style="border:1px solid #ccffff;"/>
+				<div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Cluster Analysis</div>
+				<ul>
+					<li>Use
+						<i>X</i>,
+						<i>Y</i>, and
+						<i>Z</i> to control the graphing inputs to use for clustering
+					</li>
+					<li>
+            Adjust the
+						<i>k-value</i> to control the number of clusters
+					</li>
+				</ul>
+			</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="dropdown" token="field1">
+        <label>x</label>
+      </input>
+      <input type="dropdown" token="field2">
+        <label>y</label>
+      </input>
+      <input type="dropdown" token="field3">
+        <label>z</label>
+      </input>
+      <input type="dropdown" token="field4">
+        <label>k</label>
+      </input>
       <viz type="Splunk_ML_Toolkit.Scatter3dViz">
-        <search>
-          <query>index=4s_ics
+        <search id="k_means_base">
+          <query>$index$ $proto$
 | stats count by src_ip dest_ip
 | fit GraphCentrality src_ip dest_ip compute="eigenvector_centrality,betweenness_centrality"
 | eventstats avg(count) as avg_count dc(dest_ip) as distinct_connections by src_ip
@@ -448,6 +483,14 @@
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
       </viz>
+    </panel>
+    <panel>
+      <table>
+        <search base="k_means_base">
+          <query>| table clusterId, src_ip, count, distinct_connections, eigenvector_centrality, betweenness_centrality</query>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
     </panel>
   </row>
 </form>
