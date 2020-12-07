@@ -1,18 +1,36 @@
 <form theme="dark" hideTitle="false">
-  <label></label>
+  <label>VEGA</label>
+  <search id="base_centrality">
+    <query>$index$ $proto$
+| stats count by src_ip, dest_ip
+| fit GraphCentrality src_ip dest_ip compute="eigenvector_centrality,betweenness_centrality,cluster_coefficient"
+      </query>
+  </search>
   <fieldset submitButton="false" autoRun="false"></fieldset>
-  <row>
+  <row depends="$alwaysHideCSSSection$">
     <panel>
       <html>
-        <span style="font-size: 45px; color: #ccffff; font-family:Palatino;">VEGA</span>
-        <span style="font-size: 45px; color: #ffff99;">✧  </span>
-        <span style="font-size: 16px; color: ffffff;">[ Visualization Explorer for Graph-based Analytics ]</span>
-   </html>
+                <style>
+          h1.dashboard-header-title{
+            visibility:hidden;
+          }
+        </style>
+            </html>
     </panel>
   </row>
   <row>
     <panel>
-      <title>Create slider for collision radius -- legend in HTML</title>
+      <html>
+                <span style="font-size: 45px; color: #ccffff; font-family:Palatino;">VEGA</span>
+                <span style="font-size: 45px; color: #ffff99;">✧  </span>
+                <span style="font-size: 16px; color: ffffff;">
+          <b>[ Visualization Explorer for Graph-based Analytics ]</b>
+        </span>
+            </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
       <input type="dropdown" token="index" searchWhenChanged="true">
         <label>Engagement:</label>
         <fieldForLabel>index</fieldForLabel>
@@ -26,22 +44,23 @@
         <prefix>index=</prefix>
       </input>
       <input type="multiselect" token="proto">
-        <label>Protocol</label>
-        <choice value="445">SMB</choice>
-        <choice value="*">All</choice>
-        <choice value="502">Modbus</choice>
-        <choice value="80">HTTP</choice>
-        <choice value="443">TLS</choice>
-        <choice value="53">DNS (53)</choice>
-        <choice value="5353">DNS (5353)</choice>
+        <label>Protocol:</label>
+        <choice value="*">All (*)</choice>
+        <choice value="53 OR dest_port=5353">DNS (53 / 5353)</choice>
+        <choice value="80">HTTP (80)</choice>
+        <choice value="502">Modbus (502)</choice>
+        <choice value="102">S7 (102)</choice>
+        <choice value="445">SMB (445)</choice>
+        <choice value="22">SSH (22)</choice>
+        <choice value="">Telnet (23)</choice>
+        <choice value="443">TLS (443)</choice>
         <default>*</default>
         <initialValue>*</initialValue>
-        <valuePrefix>dest_port="</valuePrefix>
-        <valueSuffix>"</valueSuffix>
+        <valuePrefix>dest_port=</valuePrefix>
         <delimiter> OR </delimiter>
       </input>
       <input type="time" token="global_time">
-        <label>Time Select</label>
+        <label>Time Select:</label>
         <default>
           <earliest>0</earliest>
           <latest></latest>
@@ -50,15 +69,59 @@
       <input type="checkbox" token="D_A" searchWhenChanged="true">
         <label>Force Directed Graph:</label>
         <choice value="enabled">Directional Arrows</choice>
-        <delimiter> </delimiter>
+        <delimiter/>
         <initialValue>enabled</initialValue>
       </input>
       <input type="checkbox" token="P_Z">
         <label></label>
         <choice value="enabled">Enable Pan / Zoom</choice>
       </input>
+      <input type="dropdown" token="C_R" searchWhenChanged="true">
+        <label>Collision Radius:</label>
+        <choice value="10">10</choice>
+        <choice value="20">20</choice>
+        <choice value="30">30</choice>
+        <choice value="40">40</choice>
+        <choice value="50">50</choice>
+        <choice value="60">60</choice>
+        <choice value="70">70</choice>
+        <choice value="80">80</choice>
+        <choice value="90">90</choice>
+        <choice value="100">100</choice>
+        <default>40</default>
+        <initialValue>40</initialValue>
+      </input>
+      <html>
+          <ul>
+          <li>
+            <b>Node colors</b> are similarly clustered based on their number of inbound connections.<br/>
+          </li>
+          <li>
+            <b>Link colors</b> are determined by their volume of events:</li>
+          </ul>
+            <center>
+          <table style="width:50%" border="0">
+          <tr>
+            <th>
+              <span style="font-size: 14px; color: #f0f4ed;"> 1 - 100 Events</span>
+            </th>
+            <th>
+              <span style="font-size: 14px; color: #63ffcf;"> 101 - 500 Events</span>
+            </th>
+            <th>
+              <span style="font-size: 14px; color: #07a9ff;"> 501 - 1,000 Events</span>
+            </th>
+            <th>
+              <span style="font-size: 14px; color: #8707ff;"> 1,001 - 10,000 Events</span>
+            </th>
+            <th>
+              <span style="font-size: 14px; color: #f8be34;"> &gt;10,000 Events</span>
+            </th>
+          </tr>
+          </table>
+        </center>
+      </html>
       <viz type="force_directed_viz.force_directed">
-        <title>Node Size aligns with Connection Count, Link color with Traffic Amount</title>
         <search>
           <query>$index$ src_ip!="-" AND src_ip!="::" $proto$
 | stats count by src_ip, dest_ip</query>
@@ -71,7 +134,7 @@
         <option name="force_directed_viz.force_directed.AttractDistanceMin">120</option>
         <option name="force_directed_viz.force_directed.AttractForceStrength">-700</option>
         <option name="force_directed_viz.force_directed.CollisionIterations">1</option>
-        <option name="force_directed_viz.force_directed.CollisionRadius">40</option>
+        <option name="force_directed_viz.force_directed.CollisionRadius">$C_R$</option>
         <option name="force_directed_viz.force_directed.CollisionStrength">0.5</option>
         <option name="force_directed_viz.force_directed.ColorRange1">100</option>
         <option name="force_directed_viz.force_directed.ColorRange1Code">#f0f4ed</option>
@@ -81,8 +144,8 @@
         <option name="force_directed_viz.force_directed.ColorRange3Code">#07a9ff</option>
         <option name="force_directed_viz.force_directed.ColorRange4">10000</option>
         <option name="force_directed_viz.force_directed.ColorRange4Code">#8707ff</option>
-        <option name="force_directed_viz.force_directed.ColorRange5">1000000</option>
-        <option name="force_directed_viz.force_directed.ColorRange5Code">#53a051</option>
+        <option name="force_directed_viz.force_directed.ColorRange5">10001</option>
+        <option name="force_directed_viz.force_directed.ColorRange5Code">#f8be34</option>
         <option name="force_directed_viz.force_directed.ForceCollision">20</option>
         <option name="force_directed_viz.force_directed.LineColor">enabled</option>
         <option name="force_directed_viz.force_directed.LinkDistance">150</option>
@@ -110,7 +173,15 @@
     </panel>
   </row>
   <row>
-    <panel>
+    <panel depends="$panel_show$">
+      <html>
+            <hr style="border:1px solid #ccffff;"/>
+            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Networked Device Identification:</div>
+             <ul>
+              <li>
+            These devices were identified using by matching the <b>organizationally unique identifier (OUI)</b>, extracted from the first 24 bits of identified MAC addresses.  </li>
+            </ul>
+      </html>
       <table>
         <search>
           <query>$index$ $proto$ orig_l2_addr=*
@@ -120,13 +191,20 @@
 | search Manufacturer=*</query>
           <earliest>0</earliest>
           <latest></latest>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show"></unset>
+            </condition>
+          </progress>
           <sampleRatio>1</sampleRatio>
         </search>
         <option name="count">20</option>
         <option name="dataOverlayMode">none</option>
         <option name="drilldown">none</option>
         <option name="percentagesRow">false</option>
-        <option name="refresh.display">progressbar</option>
         <option name="rowNumbers">true</option>
         <option name="totalsRow">false</option>
         <option name="wrap">false</option>
@@ -139,19 +217,33 @@
   </row>
   <row>
     <panel>
-      <title>Graph Analytic Measures Centrality - IDEA -- enriched device identification lookup panel next to each of these. use Base search to improve performance here.</title>
+      <html>
+            <hr style="border:1px solid #ccffff;"/>
+            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Graph Centrality Measures:</div>
+                                 <ul>
+                                <li>
+            <b>
+              Eigenvector Centrality:
+            </b>measures how many other nodes are connected to the Target Source IP. These may reflect Master nodes with high number of Outstation connections.</li>
+                                <li>
+            <b>
+              Betweenness Centrality:
+            </b>measures of how many of the shortest routes through the network flow through the Target IP. These may indicate key hubs for network traffic monitoring.</li>
+                                <li>
+            <b>
+              Local Clustering Coefficient:
+            </b>measure of the degree to which nodes in a graph tend to cluster together. The Local coefficient measures the embeddedness of a node.</li>
+                            </ul>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
       <chart>
-        <title>Eigenvector Centrality: measures how many other nodes are connected to the Target Source IP. These may reflect Master nodes with high number of Outstation connections.</title>
-        <search>
-          <query>$index$ $proto$
-| stats count by src_ip, dest_ip
-| fit GraphCentrality src_ip dest_ip compute="eigenvector_centrality"
-| table src_ip eigenvector_centrality
+        <search base="base_centrality">
+          <query>| table src_ip eigenvector_centrality
 | dedup src_ip
 | sort 10 - eigenvector_centrality</query>
-          <earliest>0</earliest>
-          <latest></latest>
-          <sampleRatio>1</sampleRatio>
         </search>
         <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
         <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
@@ -181,7 +273,7 @@
         <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
         <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
         <option name="charting.legend.mode">standard</option>
-        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.legend.placement">top</option>
         <option name="charting.lineWidth">2</option>
         <option name="refresh.display">progressbar</option>
         <option name="trellis.enabled">0</option>
@@ -189,21 +281,12 @@
         <option name="trellis.size">medium</option>
       </chart>
     </panel>
-  </row>
-  <row>
     <panel>
       <chart>
-        <title>Betweenness Centrality: measures of how many of the shortest routes through the network flow through the Target IP. These may indicate key hubs for network traffic monitoring.</title>
-        <search>
-          <query>$index$ src_ip!="::" $proto$
-| stats count by src_ip, dest_ip
-| fit GraphCentrality src_ip dest_ip compute="betweenness_centrality"
-| table src_ip betweenness_centrality
+        <search base="base_centrality">
+          <query>| table src_ip betweenness_centrality
 | dedup src_ip
 | sort 10 - betweenness_centrality</query>
-          <earliest>0</earliest>
-          <latest></latest>
-          <sampleRatio>1</sampleRatio>
         </search>
         <option name="charting.axisTitleX.text">Source IP</option>
         <option name="charting.axisTitleY.text">Betweenness Centrality</option>
@@ -215,14 +298,77 @@
         <option name="charting.drilldown">none</option>
         <option name="charting.layout.splitSeries">0</option>
         <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
-        <option name="charting.legend.placement">bottom</option>
+        <option name="charting.legend.placement">top</option>
         <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <search base="base_centrality">
+          <query>|  table src_ip cluster_coefficient
+| dedup src_ip
+| sort 10 - cluster_coefficient</query>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">top</option>
       </chart>
     </panel>
   </row>
   <row>
     <panel>
-      <input type="dropdown" token="color_mode">
+      <html>
+            <hr style="border:1px solid #ccffff;"/>
+            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Minimum Spanning Tree</div>
+        <i>Minimum Spanning Tree Algorithm:</i>
+            <ul>
+                  <li>Uses a calculated weight of edges to eliminate <i>cycles</i> (redundant loops) in the graph.</li>
+                  <li>Results in a graphed <i>spine</i> of the network.</li>
+
+           </ul>
+      </html>
+      <viz type="splunk-3D-graph-network-topology-viz.3d_graph_network_topology_viz">
+        <search>
+          <query>index=4s_ics | stats count by src_ip dest_ip
+| fit GraphCentrality src_ip dest_ip compute="eigenvector_centrality,betweenness_centrality"
+| eval col00 = "#00AA00"
+| eval colX0 = "#FF0000"
+| eval col0Y = "#FFFF00"
+| eval colXY = "#FFA500"
+`bilinearInterpolateColorGradient(betweenness_centrality, eigenvector_centrality, col00, colX0, col0Y, colXY, "color_src")`
+| eval weight_dest=0.5, edge_weight=1
+| fields - col00 colX0 col0Y colXY
+| eventstats max(count) as max_count
+| eval weight=(1-(count/max_count))*(1-eigenvector_centrality)*(1-betweenness_centrality)
+| fit MinimumSpanningTree src_ip dest_ip weight=weight
+| sort - src_ip</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+            <hr style="border:1px solid #ccffff;"/>
+            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Network Flow</div>
+             <ul>
+              <li>
+            Use the Sankey diagram to explore the volume of network traffic flow through the network.</li>
+            </ul>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="radio" token="color_mode" searchWhenChanged="true">
         <label>Color mode:</label>
         <choice value="sequential">Sequential</choice>
         <choice value="categorical">Categorical</choice>
@@ -232,12 +378,12 @@
       <input type="checkbox" token="S_R_L">
         <label>Link options:</label>
         <choice value="true">Self-referential links</choice>
-        <delimiter> </delimiter>
+        <delimiter/>
       </input>
       <input type="checkbox" token="B_L" searchWhenChanged="true">
         <label></label>
         <choice value="true">Backwards links</choice>
-        <delimiter> </delimiter>
+        <delimiter/>
       </input>
       <input type="radio" token="B_L_F">
         <label>Backwards Link Format:</label>
@@ -245,9 +391,8 @@
         <choice value="false">Solid</choice>
       </input>
       <viz type="sankey_diagram_app.sankey_diagram">
-        <title>Alluvial Network Flow</title>
         <search>
-          <query>$index$ src_ip!="-" AND src_ip!="::" AND src_ip!=f* $proto$
+          <query>$index$ (src_ip!="-" AND src_ip!="::") AND $proto$
 | stats count by src_ip, dest_ip
 | sort -count</query>
           <earliest>0</earliest>
@@ -268,6 +413,37 @@
         <option name="sankey_diagram_app.sankey_diagram.showTooltip">true</option>
         <option name="sankey_diagram_app.sankey_diagram.styleBackwards">$B_L_F$</option>
         <option name="sankey_diagram_app.sankey_diagram.useColors">true</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+            <html>
+            <hr style="border:1px solid #ccffff;"/>
+            <div style="text-align:left;font-style:bold;color:#ccffff;font-size:125%">Cluster Analysis</div>
+             <ul>
+              <li>Use <i>X</i>, <i>Y</i>, and <i>Z</i> to control the graphing inputs to use for clustering</li>
+              <li>
+            Adjust the <i>k-value</i> to control the number of clusters </li>
+            </ul>
+      </html>
+      <viz type="Splunk_ML_Toolkit.Scatter3dViz">
+        <search>
+          <query>index=4s_ics
+| stats count by src_ip dest_ip
+| fit GraphCentrality src_ip dest_ip compute="eigenvector_centrality,betweenness_centrality"
+| eventstats avg(count) as avg_count dc(dest_ip) as distinct_connections by src_ip
+| fit StandardScaler avg_count distinct_connections eigenvector_centrality betweenness_centrality
+| fit PCA SS_* k=3
+| fit KMeans PC_* k=4
+| eval clusterId= "Cluster: " + cluster, x='distinct_connections', y='betweenness_centrality', z='eigenvector_centrality'</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
         <option name="trellis.enabled">0</option>
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
