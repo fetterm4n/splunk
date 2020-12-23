@@ -453,17 +453,17 @@
   </row>
   <row>
     <panel>
-      <input type="dropdown" token="field1">
-        <label>x</label>
-      </input>
-      <input type="dropdown" token="field2">
-        <label>y</label>
-      </input>
-      <input type="dropdown" token="field3">
-        <label>z</label>
-      </input>
-      <input type="dropdown" token="field4">
-        <label>k</label>
+      <input type="dropdown" token="k">
+        <label>k (# of clusters):</label>
+        <choice value="2">2</choice>
+        <choice value="3">3</choice>
+        <choice value="4">4</choice>
+        <choice value="5">5</choice>
+        <choice value="6">6</choice>
+        <choice value="7">7</choice>
+        <choice value="8">8</choice>
+        <default>4</default>
+        <initialValue>4</initialValue>
       </input>
       <viz type="Splunk_ML_Toolkit.Scatter3dViz">
         <search id="k_means_base">
@@ -473,12 +473,14 @@
 | eventstats avg(count) as avg_count dc(dest_ip) as distinct_connections by src_ip
 | fit StandardScaler avg_count distinct_connections eigenvector_centrality betweenness_centrality
 | fit PCA SS_* k=3
-| fit KMeans PC_* k=4
+| fit KMeans PC_* k=$k$
 | eval clusterId= "Cluster: " + cluster, x='distinct_connections', y='betweenness_centrality', z='eigenvector_centrality'</query>
           <earliest>0</earliest>
+          <latest></latest>
           <sampleRatio>1</sampleRatio>
         </search>
         <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
         <option name="trellis.enabled">0</option>
         <option name="trellis.scales.shared">1</option>
         <option name="trellis.size">medium</option>
@@ -487,9 +489,35 @@
     <panel>
       <table>
         <search base="k_means_base">
-          <query>| table clusterId, src_ip, count, distinct_connections, eigenvector_centrality, betweenness_centrality</query>
+          <query>| table clusterId, src_ip, count, distinct_connections, eigenvector_centrality, betweenness_centrality
+| sort -count</query>
         </search>
+        <option name="count">20</option>
         <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="wrap">false</option>
+        <format type="color" field="src_ip">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="number" field="eigenvector_centrality"></format>
+        <format type="color" field="eigenvector_centrality">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="betweenness_centrality">
+          <colorPalette type="minMidMax" maxColor="#006D9C" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="distinct_connections">
+          <colorPalette type="minMidMax" maxColor="#53A051" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#53A051" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
       </table>
     </panel>
   </row>

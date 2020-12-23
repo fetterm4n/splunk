@@ -1,0 +1,14 @@
+VEGA Dependencies:
+
+Splunk Sankey Diagram - Custom Visualization -- https://splunkbase.splunk.com/app/3112/
+Splunk Machine Learning Toolkit - https://splunkbase.splunk.com/app/2890/
+Network Topology for Splunk -- https://splunkbase.splunk.com/app/3762/
+Force Directed App for Splunk -- https://splunkbase.splunk.com/app/3767/
+3d Graph Viz app
+  - Change Macros to Global Read:
+	- bilinearInterpolateColorGradient(7)
+	- genColorFromComponents(4)
+	- interpolateColor(4)
+	- splitColorIntoComponents(4)
+OUI Lookup table: https://gist.github.com/aallan/b4bb86db86079509e6159810ae9bd3e4
+
