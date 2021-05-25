@@ -1,0 +1,8 @@
+"AuthenticationType","AvailabilityStatus","ForceDeleteState","IsAdminManaged","IsDefault","IsInitial","IsRoot","IsVerified","Name","State","SupportedServices"
+"Managed",,,"True","True","True","True","True","ADaltfmx.onmicrosoft.com",,"Email;OfficeCommunicationsOnline"
+"Federated",,,"True","False","False","True","True","ad.solar.icam-alpha.net",,""
+"Federated",,,"True","False","False","True","True","keycloak.solar.icam-alpha.net",,""
+"Federated",,,"True","False","False","True","True","okta.solar.icam-alpha.net",,""
+"Federated",,,"True","False","False","True","True","ping.solar.icam-alpha.net",,""
+"Managed",,,"True","False","False","True","True","ADaltfmx.mail.onmicrosoft.com",,""
+"Federated",,,"True","False","False","True","True","test.solar.icam-alpha.net",,""

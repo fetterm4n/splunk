@@ -1,0 +1,1574 @@
+<form theme="dark">
+  <label>aviary</label>
+  <search id="event_base">
+    <query>$index$ $host$</query>
+    <done>
+      <set token="earliest_event">$job.earliestTime$</set>
+      <set token="latest_event">$job.latestTime$</set>
+    </done>
+  </search>
+  <fieldset submitButton="false" autoRun="true"></fieldset>
+  <row depends="$alwaysHideCSSSection$">
+    <panel>
+      <html>
+				<style>
+          h1.dashboard-header-title{
+            visibility:hidden;
+          }
+        </style>
+				<style> 
+          #owlPanel{
+            width:9% !important;
+          }
+          #aviaryPanel{
+            width:41% !important;
+          }
+          #filtersPanel{
+            width:50% !important;
+          }</style>
+			</html>
+    </panel>
+  </row>
+  <row>
+    <panel id="owlPanel">
+      <single>
+        <search>
+          <query>|makeresults count=1
+|eval emoji=printf("%c", 129417)
+|table emoji</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">180</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">0</option>
+      </single>
+    </panel>
+    <panel id="aviaryPanel">
+      <html>
+        <a id="to_top"/>
+				<span style="font-size: 40px; color: #FFD700; font-family:Palatino;">aviary</span>
+				<span style="font-size: 30px; color: #FFD700;"/>
+				<span style="font-size: 20px; color: #FFD700;">
+					<br/>
+					<b>[ 
+						<font color="GhostWhite">Companion Analysis Tool for Sparrow </font> ]
+					</b>
+					<br/>
+					<br/>
+				</span>
+				<b>To begin:</b>
+				<br/>
+				<ol type="1">
+					<li>        Ingest files from Sparrow Output with default filenames 
+						<b>(sourcetype=csv).</b>
+					</li>
+					<li>        Use Index and host selection to point avaiary to the 
+						<b>indexed location</b> of the Sparrow logs.
+					</li>
+					<li>        Review the analysis, click any 
+						<b>UserId</b> field to correlate events by the Service Principal.
+					</li>
+				</ol>
+			</html>
+    </panel>
+    <panel id="filtersPanel">
+      <title>Data Selection Filters</title>
+      <input type="dropdown" token="index" searchWhenChanged="true">
+        <label>Data Index :</label>
+        <fieldForLabel>index</fieldForLabel>
+        <fieldForValue>index</fieldForValue>
+        <search>
+          <query>| tstats count WHERE index=* GROUPBY index</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <prefix>index=</prefix>
+      </input>
+      <input type="multiselect" token="host" searchWhenChanged="true">
+        <label>Host :</label>
+        <fieldForLabel>host</fieldForLabel>
+        <fieldForValue>host</fieldForValue>
+        <search>
+          <query>$index$ | stats count by host</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <valuePrefix>host=</valuePrefix>
+        <delimiter>  OR </delimiter>
+      </input>
+      <input type="time" token="global_time">
+        <label>Time Range :</label>
+        <default>
+          <earliest>0</earliest>
+          <latest></latest>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+				<div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">Detection Summary:</div>
+				<hr style="border:1px solid #FFD700;"/>
+			</html>
+      <single>
+        <search base="event_base">
+          <query>| search source="*appupdate_operations_export.csv"  
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">App Update Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#app_update</link>
+        </drilldown>
+      </single>
+      <single>
+        <search base="event_base">
+          <query>| search source="*approleassignment_operations_export.csv" 
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">App Role Assignment Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#app_role</link>
+        </drilldown>
+      </single>
+      <single>
+        <search base="event_base">
+          <query>| search source="*Consent_Operations_Export.csv"  
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">Consent Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#consent_ops</link>
+        </drilldown>
+      </single>
+      <single>
+        <search base="event_base">
+          <query>| search source="*domain_operations_export.csv"  
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">Domain Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#domain_ops</link>
+        </drilldown>
+      </single>
+      <single>
+        <search base="event_base">
+          <query>| search source="*FileItems_Operations_Export*.csv"  
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">File Items Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#file_items</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <single>
+        <search base="event_base">
+          <query>| search source="*MailItems_Operations_Export*.csv"  
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">Mail Items Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#mail_items</link>
+        </drilldown>
+      </single>
+      <single>
+        <search base="event_base">
+          <query>| search source="*pslogin_operations_export.csv"  
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">PowerShell Login Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#ps_login</link>
+        </drilldown>
+      </single>
+      <single>
+        <search base="event_base">
+          <query>| search source="*PSMailbox_Operations_Export.csv"  
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">PowerShell Mailbox Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#ps_mailbox</link>
+        </drilldown>
+      </single>
+      <single>
+        <search base="event_base">
+          <query>| search source="*SAMLToken_Operations_Export.csv"  
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">SAML Token Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#saml_token</link>
+        </drilldown>
+      </single>
+      <single>
+        <search base="event_base">
+          <query>| search source="*/serviceprincipal_operations_export.csv"  
+| stats count</query>
+        </search>
+        <option name="colorMode">none</option>
+        <option name="drilldown">all</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="underLabel">Service Principal Operations</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_self">#SP_operations</link>
+        </drilldown>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_domain_list$">
+      <html>
+							<hr style="border:1px solid #FFD700;"/>
+				<div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">Exported Domain Information:</div>
+				<ul>
+          <li>Review the listed tenant’s Azure AD domains, to see if the domains have been modified.</li>
+        </ul>
+			</html>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_domain_list">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_domain_list"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*domain_list.csv" 
+| table Name, SupportedServices, AuthenticationType, IsAdminManaged, IsDefault, IsInitial, IsRoot, IsVerified | sort -IsDefault</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">5</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="IsAdminManaged">
+          <colorPalette type="map">{"True":#cea500,"False":#e6cb5e}</colorPalette>
+        </format>
+        <format type="color" field="IsDefault">
+          <colorPalette type="map">{"True":#cea500,"False":#e6cb5e}</colorPalette>
+        </format>
+        <format type="color" field="IsInitial">
+          <colorPalette type="map">{"True":#cea500,"False":#e6cb5e}</colorPalette>
+        </format>
+        <format type="color" field="IsRoot">
+          <colorPalette type="map">{"True":#cea500,"False":#e6cb5e}</colorPalette>
+        </format>
+        <format type="color" field="IsVerified">
+          <colorPalette type="map">{"True":#cea500,"False":#e6cb5e}</colorPalette>
+        </format>
+        <format type="color" field="AuthenticationType">
+          <colorPalette type="map">{"Managed":#cea500,"Federated":#e6cb5e}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+				<hr style="border:1px solid #FFD700;"/>
+				<div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">Trend Analysis:</div>
+			</html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <chart>
+        <title>Timeline of Sparrow Event Volume by User</title>
+        <search>
+          <query>$index$ |bucket _time span=1d | timechart count useother=false usenull=f by UserId</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time (days)</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">line</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+    <panel>
+      <chart>
+        <title>Sparrow Event Volume by Operation</title>
+        <search>
+          <query>$index$ 
+| bucket _time span=1d AS day 
+| timechart count by source</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trellis.splitBy">day</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html depends="$service_principal$">
+				<h2>
+					<b>Now Correlating Activity for: 
+						<font color="#FFD700">$service_principal$</font> ===&gt;
+						<a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+					</b>
+				</h2>
+			</html>
+      <table>
+        <title>Sparrow Detected Operations by UserId</title>
+        <search>
+          <query>$index$ $host$
+| rex field=source "(//.*//)*(?&lt;source&gt;[^//]+)$"
+| stats count by UserId, source
+| stats values(source) AS "Associated Operations" values(count) AS "Atomic Operations Count" sum(count) AS "Total Operations Count" by UserId 
+| sort -"Total Operations Count"</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Total Operations">
+          <colorPalette type="minMidMax" maxColor="#006D9C" midColor="#708794" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="Total Operations Count">
+          <colorPalette type="minMidMax" maxColor="#006D9C" midColor="#708794" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_script_exec$">
+      <html>
+            <hr style="border:1px solid #FFD700;"/>
+				<div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">Behavioral Analytics:</div>
+				<ul>
+          <li>Probable Scripted Actions Execution (high volume and diversified operations detected within 3 minute span)</li>
+        </ul>
+			</html>
+      <html depends="$service_principal$">
+				<h2>
+					<b>Now Correlating Activity for: 
+						<font color="#FFD700">$service_principal$</font> ===&gt;
+						<a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+					</b>
+				</h2>
+			</html>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_script_exec">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_script_exec"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$
+| rex field=source "(//.*//)*(?&lt;source&gt;[^//]+)$"
+| bucket _time span=3m AS bucket
+| eval window=strftime(bucket,"%Y-%m-%dT%H:%M:%S")
+| stats dc(source) AS Operations values(source) values(Operation) count AS Event_Count by UserId, window
+| eventstats dc(values(Operation)) AS Operations_Count by UserId, window
+| where Operations&gt;1 AND Operations_Count&gt;5
+| sort -count</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">2</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_SP_creation$">
+      <html>
+        <ul>
+          <li>Service Principal Creation Events</li>
+        </ul>
+      </html>
+      <html depends="$service_principal$">
+				<h2>
+					<b>Now Correlating Activity for: 
+						<font color="#FFD700">$service_principal$</font> ===&gt;
+						<a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+					</b>
+				</h2>
+			</html>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_SP_creation">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_SP_creation"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$
+| rex field=ModifiedProperties max_match=0 "\\G\[{\"Name\":\"(?&lt;name&gt;[a-zA-Z\.]{1,})\",\"NewValue\":\"(?&lt;newvalue&gt;[\/\.\;\:\w\-^,\s]{1,})\",\"OldValue\":\"(?&lt;oldvalue&gt;[\/\.\;\:\w\-^,]{0,})\"" 
+| rex field=Target "\"ID\":\"(?&lt;id&gt;[\/\.\;\:\w\-^,]{1,})\"" 
+| where name=="TargetId.ServicePrincipalNames" 
+| stats values(CreationTime)  values(id) AS "SP Account Creations" values(name) AS "Modified Propery Name" list(oldvalue) AS "Old Value" list(newvalue) AS "New Value" by UserId, Operation</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Operation">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_app_update$">
+      <html>
+      <a id="app_update"/>
+      <hr style="border:1px solid #FFD700;"/>
+      <div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">App Update Operations:</div>
+      <ul>
+        <li>Searches for any modifications or credential modifications to an application.</li>
+        <li>Review the top actors for activity in the environment and the number of credential modifications performed.</li>
+        <li>Monitor changes in application and service principal credentials.</li>
+        <li>Investigate any instances of excessive permissions being granted, including, but not limited to, Exchange Online, Microsoft Graph, and Azure AD Graph.</li>
+        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+      </ul>
+    </html>
+      <html depends="$service_principal$">
+      <h2>
+        <b>Now Correlating Activity for:
+          <font color="#FFD700">$service_principal$</font> ===&gt;
+          <a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+        </b>
+      </h2>
+    </html>
+      <chart>
+        <search>
+          <query>$index$ $host$ source="*AppUpdate_Operations_Export.csv" | timechart count by Operation</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trellis.splitBy">ResultStatus</option>
+      </chart>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_app_update">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_app_update"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*AppUpdate_Operations_Export.csv" | stats values(CreationTime) AS "Event Times", values(Operation) AS "Operation", values(Target) AS "Target", values(ObjectId) AS "Modified Objects", values(ModifiedProperties) AS "ModifiedProperies (Name, New Value, Old Value)", values(ExtendedProperties) AS "Extended Properties" by UserId, ClientIP, ResultStatus
+| sort -"Event Times"</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+      <html>
+      <a href="#to_top" style="white;">back to top</a>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show$">
+      <html>
+        <a id="app_role"/>
+				<hr style="border:1px solid #FFD700;"/>
+				<div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">App Role Assignment Operations:</div>
+				<ul>
+					<li>Searches for any app role assignments to service principals, users, and groups.</li>
+					<li>Review the top actors for activity in the environment and the number of credential modifications performed.</li>
+        <li>Monitor changes in application and service principal credentials.</li>
+        <li>Investigate any instances of excessive permissions being granted, including, but not limited to, Exchange Online, Microsoft Graph, and Azure AD Graph.</li>
+	        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+				</ul>
+			</html>
+      <html depends="$service_principal$">
+				<h2>
+					<b>Now Correlating Activity for: 
+						<font color="#FFD700">$service_principal$</font> ===&gt;
+						<a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+					</b>
+				</h2>
+			</html>
+      <chart>
+        <search>
+          <query>$index$ $host$ source="*approleassignment_operations_export.csv" | timechart count by Operation</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trellis.splitBy">ResultStatus</option>
+      </chart>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*approleassignment_operations_export.csv" | rex field=ModifiedProperties max_match=0 "\"Name\":\"(?&lt;name&gt;[a-zA-Z\.]{1,})\",\"NewValue\":\"(?&lt;newvalue&gt;[\/\.\;\:\w\-^,\s]{1,})\",\"OldValue\":\"(?&lt;oldvalue&gt;[\/\.\;\:\w\-^,]{0,})\"" 
+| replace "" with "None" 
+| table UserId, CreationTime, ResultStatus, Operation, name, oldvalue, newvalue
+| rename name AS Name, oldvalue AS OldValue, newvalue AS NewValue</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">5</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+      <html>
+				<a href="#to_top" style="white;">back to top</a>
+			</html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_consent_ops$">
+      <html>
+      <a id="consent_ops"/>
+      <hr style="border:1px solid #FFD700;"/>
+      <div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">Consent Operations:</div>
+      <ul>
+        <li>Searches for any OAuth or application consents.</li>
+        <li>Review OAuth consent and users’ consent to applications, which is useful for interpreting changes in adversary TTPs.</li>
+        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+      </ul>
+    </html>
+      <html depends="$service_principal$">
+      <h2>
+        <b>Now Correlating Activity for:
+          <font color="#FFD700">$service_principal$</font> ===&gt;
+          <a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+        </b>
+      </h2>
+    </html>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_consent_ops">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_consent_ops"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*Consent_Operations_Export.csv" | table *</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ClientIP">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+      <html>
+      <a href="#to_top" style="white;">back to top</a>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_domain_ops$">
+      <html>
+      <a id="domain_ops"/>
+      <hr style="border:1px solid #FFD700;"/>
+      <div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">Domain Operations:</div>
+      <ul>
+        <li>Searches for any modifications to the domain and federation settings on a tenant's domain.</li>
+        <li>
+            <b>
+              <u>Domain and federation modification operations are uncommon and should be investigated.</u>
+            </b>
+          </li>
+        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+      </ul>
+    </html>
+      <html depends="$service_principal$">
+      <h2>
+        <b>Now Correlating Activity for:
+          <font color="#FFD700">$service_principal$</font> ===&gt;
+          <a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+        </b>
+      </h2>
+    </html>
+      <chart>
+        <search>
+          <query>$index$ $host$ 
+| bucket _time span=1d as day 
+| where like(Operation, "%credentials%") or like(Operation, "%authentication%") And ResultStatus=="Success" 
+| eval UserOperation=UserId + ": " + Operation 
+| timechart useother=false usenull=f count by UserOperation</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trellis.splitBy">ResultStatus</option>
+      </chart>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_domain_ops">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_domain_ops"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*Domain_Operations_Export.csv" | stats values(CreationTime) AS "Event Times", values(Operation) AS "Operation", values(ObjectId) AS "Modified Objects", values(ModifiedProperties) AS "ModifiedProperies (Name, New Value, Old Value)", values(ExtendedProperties) AS "Extended Properties" by UserId, ClientIP, ResultStatus</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+      <html>
+      <a href="#to_top" style="white;">back to top</a>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_file_items$">
+      <html>
+      <a id="file_ops"/>
+      <hr style="border:1px solid #FFD700;"/>
+      <div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">File Items Operations:</div>
+      <ul>
+        <li>Determines if the AppInvestigation sub-directory by displayname path exists, and if not, creates that path.</li>
+        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+      </ul>
+    </html>
+      <html depends="$service_principal$">
+      <h2>
+        <b>Now Correlating Activity for:
+          <font color="#FFD700">$service_principal$</font> ===&gt;
+          <a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+        </b>
+      </h2>
+    </html>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_file_items">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_file_items"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*FileItems_Operations_Export.csv" | table *</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ClientIP">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+      <html>
+      <a href="#to_top" style="white;">back to top</a>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_mail_items$">
+      <html>
+      <a id="mail_ops"/>
+      <hr style="border:1px solid #FFD700;"/>
+      <div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">Mail Items Operations:</div>
+      <ul>
+        <li>Searches for the AppID to see if it accessed mail items.</li>
+        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+      </ul>
+    </html>
+      <html depends="$service_principal$">
+      <h2>
+        <b>Now Correlating Activity for:
+          <font color="#FFD700">$service_principal$</font> ===&gt;
+          <a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+        </b>
+      </h2>
+    </html>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_mail_items">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_mail_items"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*MailItems_Operations_Export.csv" | table *</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ClientIP">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+      <html>
+      <a href="#to_top" style="white;">back to top</a>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_ps_login$">
+      <html>
+      <a id="ps_login"/>
+      <hr style="border:1px solid #FFD700;"/>
+      <div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">PowerShell Login Operations:</div>
+      <ul>
+        <li>Searches for well-known AppID for Exchange Online PowerShell.</li>
+        <li>Searches for well-known AppID for PowerShell.</li>     
+        <li>Searches for WinRM useragent string in the user logged in and user login failed operations.</li>
+        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+      </ul>
+    </html>
+      <html depends="$service_principal$">
+      <h2>
+        <b>Now Correlating Activity for:
+          <font color="#FFD700">$service_principal$</font> ===&gt;
+          <a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+        </b>
+      </h2>
+    </html>
+      <chart>
+        <search>
+          <query>$index$ $host$ source="*PSLogin_Operations_Export.csv" | timechart count by UserId</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">top</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trellis.splitBy">ResultStatus</option>
+      </chart>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_ps_login">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_ps_login"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*PSLogin_Operations_Export.csv" | stats values(CreationTime) AS "Event Times", values(Operation) AS "Operation", values(ObjectId) AS "Modified Objects", values(ExtendedProperties) AS "Extended Properties" by UserId, ClientIP, ResultStatus</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+      <html>
+      <a href="#to_top" style="white;">back to top</a>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_ps_mailbox$">
+      <html>
+      <a id="ps_mailbox"/>
+      <hr style="border:1px solid #FFD700;"/>
+      <div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">PowerShell Mailbox Operations:</div>
+      <ul>
+        <li>Searches for PowerShell logins into mailboxes.</li>
+        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+      </ul>
+    </html>
+      <html depends="$service_principal$">
+      <h2>
+        <b>Now Correlating Activity for:
+          <font color="#FFD700">$service_principal$</font> ===&gt;
+          <a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+        </b>
+      </h2>
+    </html>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_ps_mailbox">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_ps_mailbox"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*PSMailbox_Operations_Export.csv " | table *</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ClientIP">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+      <html>
+      <a href="#to_top" style="white;">back to top</a>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_SAML_token$">
+      <html>
+      <a id="SAML_token"/>
+      <hr style="border:1px solid #FFD700;"/>
+      <div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">SAML Token Operations:</div>
+      <ul>
+        <li>Searches for SAML token usage anomaly (UserAuthenticationValue of 16457) in the Unified Audit.</li>
+        <li>Identify anomalous Security Assertion Markup Language (SAML) token sign-ins by pivoting on the unified audit log UserAuthenticationValue of 16457, which is an indicator of how a SAML token was built and is a potential indicator for forged SAML tokens.</li>
+        <ul>
+            <li>Note that this TTP has not been the subject of significant published security research but may indicate an unusual usage of a token, such as guest access for external partners to M365 resources.</li>
+          </ul>
+
+        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+      </ul>
+    </html>
+      <html depends="$service_principal$">
+      <h2>
+        <b>Now Correlating Activity for:
+          <font color="#FFD700">$service_principal$</font> ===&gt;
+          <a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+        </b>
+      </h2>
+    </html>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_SAML_token">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_SAML_token"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*SAMLToken_Operations_Export.csv  " | table *</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ClientIP">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value$</set>
+        </drilldown>
+      </table>
+      <html>
+      <a href="#to_top" style="white;">back to top</a>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_service_principal$">
+      <html>
+      <a id="SP_operations"/>
+      <hr style="border:1px solid #FFD700;"/>
+      <div style="text-align:left;font-style:bold;color:#FFD700;font-size:125%">Service Principal Operations:</div>
+      <ul>
+        <li>Searches for any modifications or credential modifications to a service principal.</li>
+        <li>Click any <b>UserId</b> to correlate all the associated events.</li>
+      </ul>
+    </html>
+      <html depends="$service_principal$">
+      <h2>
+        <b>Now Correlating Activity for:
+          <font color="#FFD700">$service_principal$</font> ===&gt;
+          <a href="#analysis_panel" style="white;">Jump to analysis panel!</a>
+        </b>
+      </h2>
+    </html>
+      <table>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_service_principal">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_service_principal"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ source="*ServicePrincipal_Operations_Export.csv " | table *</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">false</option>
+        <format type="color" field="ActorContextId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ClientIP">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="ResultStatus">
+          <colorPalette type="map">{"Success":#74B38C,"Failure":#B58282}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="service_principal">$click.value2$</set>
+        </drilldown>
+      </table>
+      <html>
+      <a href="#to_top" style="white;">back to top</a>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panel_show_analysis$">
+      <html>
+				<hr style="border:1px solid yellow;"/>
+				<div style="text-align:left;font-style:bold;color:gold;font-size:125%">Analysis Panel:</div>
+			</html>
+      <html depends="$service_principal$">
+				<a id="analysis_panel"/>
+				<h2>
+					<b>Active UserId Correlation for: 
+						<font color="#FFD700">$service_principal$</font>
+					</b>
+				</h2>
+			</html>
+      <chart>
+        <title>Ratio of Successful / Failed Operations by Type for $service_principal$</title>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_analysis">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_analysis"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ UserId=$service_principal$
+| chart count OVER ResultStatus by source</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.axisTitleY.text">Operation Count</option>
+        <option name="charting.axisTitleY.visibility">collapsed</option>
+        <option name="charting.axisTitleY2.visibility">collapsed</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.showLabels">1</option>
+        <option name="charting.chart.showPercent">1</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.placement">none</option>
+        <option name="height">197</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.size">small</option>
+        <option name="trellis.splitBy">source</option>
+        <option name="charting.fieldColors">{"Success":#74B38C,"Failure":#B58282, "Succeed":#74B38A}</option>
+      </chart>
+      <chart>
+        <title>Timeline of Detected Operations for $service_principal$</title>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_analysis">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_analysis"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ UserId=$service_principal$
+| timechart count by source</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+        </search>
+        <option name="charting.axisTitleX.text">Time</option>
+        <option name="charting.axisTitleY.text">Operation Count</option>
+        <option name="charting.chart">column</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.legend.placement">bottom</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+      <table>
+        <title>Detected Operations Count &amp; Trends for $service_principal$</title>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_analysis">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_analysis"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ UserId=$service_principal$
+| stats count sparkline AS Trend by UserId, source 
+| sort -count</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="source">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+      <html>
+				<a href="#to_top" style="white;">back to top</a>
+			</html>
+      <table>
+        <title>Raw Events by Operations for $service_principal$</title>
+        <search>
+          <progress>
+            <condition match="'job.resultCount' &gt; 0">
+              <set token="panel_show_analysis">true</set>
+            </condition>
+            <condition>
+              <unset token="panel_show_analysis"></unset>
+            </condition>
+          </progress>
+          <query>$index$ $host$ UserId=$service_principal$</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="UserId">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="source">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="count">
+          <colorPalette type="minMidMax" maxColor="#DC4E41" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+      <html>
+				<a href="#to_top" style="white;">back to top</a>
+			</html>
+    </panel>
+  </row>
+</form>
