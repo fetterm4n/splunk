@@ -1,0 +1,486 @@
+<form theme="dark">
+  <label>MLTK DGA</label>
+  <fieldset submitButton="false" autoRun="true"></fieldset>
+  <row depends="$alwaysHideCSSSection$">
+    <panel>
+      <html>
+				<style>
+          h1.dashboard-header-title{
+            visibility:hidden;
+          }
+        </style>
+				<style>
+          #treePanel{
+            width:09% !important;
+          }
+          #titlePanel{
+            width:56% !important;
+          }
+          #filtersPanel{
+            width:35% !important;
+          }</style>
+			</html>
+    </panel>
+  </row>
+  <row>
+    <panel id="treePanel">
+      <single>
+        <search>
+          <query>|makeresults count=1
+|eval tree=printf("%c", 127794)
+|table tree</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="height">180</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">0</option>
+      </single>
+    </panel>
+    <panel id="titlePanel">
+      <html>
+				<a id="to_top"/>
+				<span style="font-size: 25px; color: #75d18e; font-family:Palatino; text-align:center">DGA Classification with RandomForest    </span>
+				<span style="font-size: 15px; color: #75d18e;">
+					<b>[
+
+						<font color="#d5e3d9">MLTK Feature Engineering, Model Selection, and Classification </font> ]
+
+					</b>
+				</span>
+				<br/>
+				<b>To begin:</b>
+				<ol type="1">
+					<li>        Ingest training data from /data/csv using
+						<b>(sourcetype=csv).</b>
+					</li>
+					<li>        Use Index and host selection (right) to point to the
+
+						<b>indexed location</b> of the DGA data.
+
+					</li>
+				</ol>
+			</html>
+    </panel>
+    <panel id="filtersPanel">
+      <input type="dropdown" token="index" searchWhenChanged="true">
+        <label>Data Index :</label>
+        <fieldForLabel>index</fieldForLabel>
+        <fieldForValue>index</fieldForValue>
+        <search>
+          <query>|tstats count by index</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <prefix>index=</prefix>
+        <default>mltk</default>
+      </input>
+      <input type="multiselect" token="host" searchWhenChanged="true">
+        <label>Host :</label>
+        <fieldForLabel>host</fieldForLabel>
+        <fieldForValue>host</fieldForValue>
+        <search>
+          <query>$index$ | stats count by host</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <valuePrefix>host=</valuePrefix>
+        <delimiter>  OR </delimiter>
+        <initialValue>DGA</initialValue>
+      </input>
+      <input type="time" token="global_time">
+        <label>Time Range :</label>
+        <default>
+          <earliest>0</earliest>
+          <latest></latest>
+        </default>
+      </input>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+				<hr style="border:1px solid #75d18e;"/>
+				<div style="text-align:center;font-style:bold;color:#75d18e;font-size:130%">Exploratory Data Analysis (EDA)</div>
+				<b>Observations:</b>
+				<ul>
+					<li>Domain is not unique due to variation of extracted_host (e.g. companies with country specific sites), if it is considered as part of model the duplicated values should be removed</li>
+					<li>The mimimum length character length of a DGA entry is 12 characters</li>
+					<li>Approximately 60 / 40 distribution of legit / DGA samples</li>
+					<li>133926 Total Samples, no duplicated domains</li>
+					<li>We do not have exhaustive observations for the product of tld and class ~99% of TLD do not have observations where class is DGA</li>
+					<li>The imbalance where there are observations for both classes is heavily skewed, thus tld as a feature may be difficult to generalize</li>
+				</ul>
+			</html>
+      <chart>
+        <title>TLD Distribution:</title>
+        <search>
+          <query>index=mltk
+| rex field=extracted_host "(?&lt;TLD&gt;\.\w+?)(?:$$$$|\/)"
+| chart count OVER class by TLD</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisEnd</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+      <table>
+        <title>Summary Statistics:</title>
+        <search>
+          <query>$index$ $host$
+| eval domain_length=len(domain)
+| stats values(subclass) AS subClass min(domain_length) AS minDomainLength avg(domain_length) AS avgDomainLength count AS samplesPerClassification by class
+| eventstats sum(samplesPerClassification) as totalSamples
+| eval percentage=samplesPerClassification/totalSamples</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <format type="number" field="percentage">
+          <option name="unit">%</option>
+        </format>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#75D18E,"legit":#708794}</colorPalette>
+        </format>
+        <format type="number" field="avgDomainLength"></format>
+      </table>
+      <table>
+        <title>Indexed Data:</title>
+        <search>
+          <query>$index$ $host$ | table *
+| fields - eventtype, linecount, splunk_server_group, src_ip, tag, tag::eventtype</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#75D18E,"legit":#708794}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+				<hr style="border:1px solid #75d18e;"/>
+				<div style="text-align:center;font-style:bold;color:#75d18e;font-size:130%">Feature Engineering</div>
+				<ul>
+					<li>Creates additional features for training</li>
+					<li>Create
+						<b>domainLength</b>, counting the number of characters in domain
+					</li>
+					<li>Create
+						<b>domainVowelCount</b> and
+						<b>domainVowelRatio</b> - domainVowelCount is not for use the model but rather required for calculating the ratio of characters in the domain that are vowels
+					</li>
+					<li>Create
+						<b>digitCount</b>, counting the number of characters in domain that are digits
+					</li>
+				</ul>
+			</html>
+      <table>
+        <search>
+          <query>$index$ $host$
+| eval domainLength=len(domain)
+| rex field=domain max_match=20 "(?&lt;vowels&gt;[AEIOUaeiou])"
+| rex field=domain max_match=20 "(?&lt;digits&gt;[0-9])"
+| eval combo=mvjoin(vowels, "")
+| eval dg_combo=mvjoin(digits, "")
+| eval digitCount=len(dg_combo)
+| eval domainVowelCount=len(combo)
+| eval domainVowelRatio=round(domainVowelCount/domainLength, 2)
+| fillnull digitCount
+| table class, subclass, domain, extracted_host, domainLength, domainVowelCount, domainVowelRatio, digitCount</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#75D18E,"legit":#708794}</colorPalette>
+        </format>
+        <format type="color" field="domainLength">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="domainVowelCount">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="domainVowelRatio">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="digitCount">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+				<hr style="border:1px solid #75d18e;"/>
+				<div style="text-align:center;font-style:bold;color:#75d18e;font-size:130%"> Pre-processing / Test/Train Preparation </div>
+				<ul>
+					<li>Split Train / Test ( 70% / 30% ) using a stratified sampling method ( | sample )</li>
+					<li>Created testing / training dataset lookups
+						<b>dga_RF_train.csv</b>,
+						<b>dga_RF_test.csv</b>
+					</li>
+				</ul>
+			</html>
+      <table>
+        <title>dga_RF_train.csv</title>
+        <search>
+          <query>| inputlookup dga_RF_train.csv
+| head 5
+| table class, domain, domainLength, domainVowelCount, domainVowelRatio, digitCount</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#75D18E,"legit":#708794}</colorPalette>
+        </format>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#75D18E,"legit":#708794}</colorPalette>
+        </format>
+        <format type="color" field="domainLength">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="domainVowelCount">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="domainVowelRatio">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="digitCount">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+      </table>
+      <table>
+        <title>dga_RF_test.csv</title>
+        <search>
+          <query>| inputlookup dga_RF_test.csv
+| head 5
+| table class, domain, domainLength, domainVowelCount, domainVowelRatio, digitCount</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#75D18E,"legit":#708794}</colorPalette>
+        </format>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#75D18E,"legit":#708794}</colorPalette>
+        </format>
+        <format type="color" field="domainLength">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="domainVowelCount">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="domainVowelRatio">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="digitCount">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+				<hr style="border:1px solid #75d18e;"/>
+				<div style="text-align:center;font-style:bold;color:#75d18e;font-size:130%">Model Comparison</div>
+				<ul>
+					<li>Compare Models and performance</li>
+					<li>The
+						<b>precision</b> is the ratio tp / (tp + fp) where tp is the number of true positives and fp the number of false positives. The precision is intuitively the ability of the classifier not to label as positive a sample that is negative.
+					</li>
+					<li>The
+						<b>recall</b> is the ratio tp / (tp + fn) where tp is the number of true positives and fn the number of false negatives. The recall is intuitively the ability of the classifier to find all the positive samples.
+					</li>
+					<li>The
+						<b>F-beta score</b> can be interpreted as a weighted mean of the precision and recall, where an F-beta score reaches its best value at 1 and worst score at 0. beta == 1.0 means recall and precision are equally important.
+					</li>
+					<li>The
+						<b>support</b> is the number of occurrences of each class in y_true.
+					</li>
+				</ul>
+			</html>
+      <table>
+        <search>
+          <query>| listmodels</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#75D18E,"legit":#708794}</colorPalette>
+        </format>
+        <format type="color" field="name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+      <table>
+        <title>Precision, Recall, F-score, Support</title>
+        <search>
+          <query>| inputlookup dga_RF_test.csv
+| apply dga_RF_classifier
+| score precision_recall_fscore_support class against predicted(class)</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#75D18E,"legit":#708794}</colorPalette>
+        </format>
+        <format type="color" field="name">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="type">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="Metric">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="scored(dga)">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+        <format type="color" field="scored(legit)">
+          <colorPalette type="minMidMax" maxColor="#787878" midColor="#A1A1A1" minColor="#ADADAD"></colorPalette>
+          <scale type="minMidMax" midType="percentile" midValue="50"></scale>
+        </format>
+      </table>
+      <chart>
+        <title>Confusion Matrix</title>
+        <search>
+          <query>| inputlookup dga_RF_test.csv
+| apply dga_RF_classifier
+| score confusion_matrix class against predicted(class)</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisTitleX.text">Confusion Matrix</option>
+        <option name="charting.axisTitleX.visibility">collapsed</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.showDataLabels">all</option>
+        <option name="charting.chart.stackMode">stacked</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="refresh.display">progressbar</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html>
+				<hr style="border:1px solid #75d18e;"/>
+				<div style="text-align:center;font-style:bold;color:#75d18e;font-size:130%">Model Application</div>
+				<ul>
+					<li>Convert to lowercase</li>
+					<li>remove characters that do not fall in range of [a-z0-9\-]</li>
+					<li>Remove all whitespace</li>
+					<li>De-duplicate</li>
+					<li>create domain_len, counting the number of characters in domain</li>
+					<li>create domain_vowel_count and domain_vowel_ratio - domain_vowel_count is not for use the model but rather required for calculating the ratio of characters in the domain that are vowels</li>
+					<li>create domain_digit_count, counting the number of characters in domain that are digits</li>
+				</ul>
+			</html>
+      <table>
+        <search>
+          <query>| inputlookup dga_RF_test.csv
+| sample 100
+| apply dga_RF_classifier
+| table domain, class, predicted(class), domainLength, domainVowelCount, digitCount, domainVowelRatio</query>
+          <earliest>$global_time.earliest$</earliest>
+          <latest>$global_time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">true</option>
+        <format type="color" field="class">
+          <colorPalette type="map">{"dga":#708794,"legit":#4FA484}</colorPalette>
+        </format>
+        <format type="color" field="Metric">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+        <format type="color" field="predicted(class)">
+          <colorPalette type="map">{"legit":#4FA484,"dga":#708794}</colorPalette>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>
